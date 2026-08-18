@@ -2,9 +2,9 @@
 
 ## 1. Purpose
 
-This repository contains the current Step 1 prototype for an internal STC tool:
-fetch confirmed Nezasa / TripBuilder booking data by Booking ID and save the raw
-JSON response locally.
+This repository contains the current Step 1 prototype for travel agencies using
+Nezasa / TripBuilder: fetch confirmed booking data by Booking ID and save the
+raw JSON response locally.
 
 The long-term project may later generate editable Word travel documents, but
 that phase is explicitly on hold.
@@ -14,7 +14,7 @@ that phase is explicitly on hold.
 The active workflow is:
 
 ```text
-STC employee
+Travel agency user
   -> enters Distribution Channel
   -> enters API Username
   -> enters Booking ID
@@ -84,11 +84,8 @@ API Key / Password
 Fetch & Save JSON button
 ```
 
-Default Distribution Channel:
-
-```text
-stc-ch
-```
+The Distribution Channel can optionally be prefilled through the
+`NEZASA_DISTRIBUTION_CHANNEL` environment variable.
 
 The password input uses a masked Tkinter entry:
 
@@ -127,7 +124,7 @@ https://{distribution-channel}.tripbuilder.app/bookings/v1.13/{booking_id}
 Example URL shape:
 
 ```text
-https://stc-ch.tripbuilder.app/bookings/v1.13/examplebookingid
+https://example-channel.tripbuilder.app/bookings/v1.13/examplebookingid
 ```
 
 There is no `/api/` segment in the URL.
@@ -194,11 +191,8 @@ Distribution Channel input is sanitized before use:
 - normalize to lowercase
 - keep only `a-z`, `0-9`, and `-`
 
-If the field is empty, the default is used:
-
-```text
-stc-ch
-```
+The field is required unless it is prefilled through the
+`NEZASA_DISTRIBUTION_CHANNEL` environment variable.
 
 The channel becomes the host prefix:
 
@@ -209,7 +203,7 @@ The channel becomes the host prefix:
 Example:
 
 ```text
-stc-de -> https://stc-de.tripbuilder.app
+example-channel -> https://example-channel.tripbuilder.app
 ```
 
 ## 12. JSON Save Location
@@ -223,7 +217,7 @@ Resolution order:
 3. `%OneDrive%\Desktop`
 4. user home directory fallback
 
-This exists because STC Windows environments may redirect Desktop via OneDrive.
+This exists because Windows environments may redirect Desktop via OneDrive.
 
 A future improvement may replace this with a Save As dialog.
 

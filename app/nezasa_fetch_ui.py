@@ -1,9 +1,9 @@
 """
 Nezasa Booking JSON Fetcher.
 
-Small internal GUI for Step 1 of the STC travel-document workflow:
-enter a Nezasa Booking ID, fetch the confirmed booking via the TripBuilder
-Booking API, and save the raw JSON response locally.
+Small GUI for travel agencies using Nezasa / TripBuilder:
+enter a Booking ID, fetch the confirmed booking via the Booking API, and save
+the complete raw JSON response locally.
 
 JSON-to-Word generation is intentionally out of scope for this file.
 """
@@ -20,7 +20,7 @@ from typing import Any
 
 
 DEFAULT_API_USERNAME = os.environ.get("NEZASA_API_USERNAME", "")
-DEFAULT_DISTRIBUTION_CHANNEL = "stc-ch"
+DEFAULT_DISTRIBUTION_CHANNEL = os.environ.get("NEZASA_DISTRIBUTION_CHANNEL", "")
 BOOKING_API_VERSION = "v1.13"
 ACCEPT_HEADER = "application/vnd.api+json"
 REQUEST_TIMEOUT_SECONDS = 30
@@ -74,7 +74,7 @@ def sanitize_booking_id(raw_booking_id: str) -> str:
 def sanitize_distribution_channel(raw_channel: str) -> str:
     channel = raw_channel.strip().lower()
     channel = re.sub(r"[^a-z0-9-]", "", channel)
-    return channel or DEFAULT_DISTRIBUTION_CHANNEL
+    return channel
 
 
 def build_booking_url(distribution_channel: str, booking_id: str) -> str:
@@ -173,7 +173,8 @@ class NezasaFetchApp:
 
         tk.Label(root, text="Distribution Channel:").pack(pady=(15, 0))
         self.channel_entry = tk.Entry(root, width=40)
-        self.channel_entry.insert(0, DEFAULT_DISTRIBUTION_CHANNEL)
+        if DEFAULT_DISTRIBUTION_CHANNEL:
+            self.channel_entry.insert(0, DEFAULT_DISTRIBUTION_CHANNEL)
         self.channel_entry.pack()
 
         tk.Label(root, text="API Username:").pack(pady=(10, 0))
@@ -198,12 +199,14 @@ class NezasaFetchApp:
         ).pack(pady=22)
 
     def on_fetch(self) -> None:
-        distribution_channel = sanitize_distribution_channel(
-            self.channel_entry.get() or DEFAULT_DISTRIBUTION_CHANNEL
-        )
+        distribution_channel = sanitize_distribution_channel(self.channel_entry.get())
         username = self.username_entry.get().strip()
         booking_id = sanitize_booking_id(self.booking_entry.get())
         password = self.password_entry.get().strip()
+
+        if not distribution_channel:
+            messagebox.showerror("Error", "Please enter the Distribution Channel.")
+            return
 
         if not username:
             messagebox.showerror("Error", "Please enter the API username.")
