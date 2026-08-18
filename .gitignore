@@ -1,0 +1,26 @@
+# Local secrets
+.env
+*.env
+
+# Python local files
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Generated booking/customer data
+*.json
+*.csv
+*.tsv
+*.xlsx
+*.xls
+data/
+exports/
+
+# Generated or experimental documents
+*.doc
+*.docx
+*.pdf
+*.zip
+output/
+output_docs/
